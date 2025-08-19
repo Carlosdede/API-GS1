@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="API_GS1:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/API_GS1_jar</output-path>
+    <root id="archive" name="API_GS1.jar">
+      <element id="module-output" name="API_GS1" />
+    </root>
+  </artifact>
+</component>
