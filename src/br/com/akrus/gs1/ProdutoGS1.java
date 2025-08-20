@@ -37,6 +37,7 @@ public class ProdutoGS1 {
                 String imagem = "";
 
 
+
                 switch (marca) {
                     case "SAFRAMIX":
                         imagem = "https://raw.githubusercontent.com/dpti-akrus/imagensGS1/main/Saframix.jpg";

@@ -2,10 +2,17 @@ package br.com.akrus.gs1;
 
 import br.com.sankhya.extensions.actionbutton.AcaoRotinaJava;
 import br.com.sankhya.extensions.actionbutton.ContextoAcao;
+import br.com.sankhya.jape.core.JapeSession;
+import br.com.sankhya.jape.sql.NativeSql;
+import br.com.sankhya.modelcore.util.DynamicEntityNames;
+import br.com.sankhya.modelcore.util.EntityFacadeFactory;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.math.BigDecimal;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
@@ -68,6 +75,58 @@ public class EnviarGS1 implements AcaoRotinaJava {
 
         System.out.println("Resposta da GS1: " + response.toString());
 
+        // 4 - Extrair GTIN da resposta e atualizar o banco
+        if (status >= 200 && status < 300) {
+            String gtin = extrairGTIN(response.toString());
+            if (gtin != null && !gtin.isEmpty()) {
+                atualizarCodigoBarras(codProd, gtin);
+                contexto.setMensagemRetorno("GTIN " + gtin + " gerado com sucesso e salvo no produto!");
+            } else {
+                throw new Exception("GTIN não encontrado na resposta da API");
+            }
+        } else {
+            throw new Exception("Erro na API GS1: " + response.toString());
+        }
 
+    } catch (Exception e) {
+        contexto.setMensagemRetorno("Erro: " + e.getMessage());
+        throw e;
+    }
+
+
+private String extrairGTIN(String jsonResponse) throws Exception {
+    try {
+        JsonParser parser = new JsonParser();
+        JsonObject jsonObject = parser.parse(jsonResponse).getAsJsonObject();
+
+        if (jsonObject.has("product")) {
+            JsonObject product = jsonObject.getAsJsonObject("product");
+            if (product.has("gs1TradeItemIdentificationKey")) {
+                JsonObject gtinKey = product.getAsJsonObject("gs1TradeItemIdentificationKey");
+                if (gtinKey.has("gtin")) {
+                    return gtinKey.get("gtin").getAsString();
+                }
+            }
+        }
+
+        throw new Exception("Estrutura do JSON diferente do esperado. GTIN não encontrado: " + jsonResponse);
+
+    } catch (Exception e) {
+        throw new Exception("Erro ao extrair GTIN do JSON: " + e.getMessage());
     }
 }
+
+    private void atualizarCodigoBarras(ContextoAcao contexto, BigDecimal codProd, String gtin) throws Exception {
+        try {
+            // Buscar a linha do produto selecionado
+            contexto.setLinha(contexto.getLinhaAtual());
+
+            // Atualizar o campo AD_CODBARRA diretamente no contexto
+            contexto.setCampo("AD_CODBARRA", gtin);
+
+            System.out.println("Campo AD_CODBARRA atualizado para: " + gtin);
+
+        } catch (Exception e) {
+            throw new Exception("Erro ao atualizar código de barras: " + e.getMessage());
+        }
+    }
