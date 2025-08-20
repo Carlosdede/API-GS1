@@ -3,6 +3,13 @@
     <output-path>$PROJECT_DIR$/out/artifacts/API_GS1_jar</output-path>
     <root id="archive" name="API_GS1.jar">
       <element id="module-output" name="API_GS1" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/lib/jape.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/lib/sanutil.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/lib/gson-2.1.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/lib/json-20140107.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/lib/sankhya-commons.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/lib/httpclient-4.0.1.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/lib/SankhyaW-extensions.jar" path-in-jar="/" />
     </root>
   </artifact>
 </component>

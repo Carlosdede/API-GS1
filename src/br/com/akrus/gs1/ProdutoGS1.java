@@ -14,27 +14,77 @@ import org.json.JSONObject;
 public class ProdutoGS1 {
 
 
-        public String montarJsonProduto(ContextoAcao contexto) throws Exception {
-            try {
-                // Captura os campos do produto vindos do Sankhya
-                String codProd = (String) contexto.getParam("CODPROD");
-                String descProd = (String) contexto.getParam("DESCRPROD");
-                String cad = "A63862";
-                String marca = (String) contexto.getParam("MARCA");
-                String ncm = (String) contexto.getParam("NCM");
-                String cest = (String) contexto.getParam("CEST");
-                BigDecimal pesoBruto = (BigDecimal) contexto.getParam("PESOBRUTO");
-                BigDecimal pesoLiq = (BigDecimal) contexto.getParam("PESOLIQ");
-                String unidadeMedidaPesoBruto = "KGM"; // exemplo: Quilograma
-                String unidadeMedidaConteudo = "MLT"; // exemplo: Mililitro
-                String codVol = (String) contexto.getParam("CODVOL");
-                String gpc = "10003291";
-                BigDecimal altura = (BigDecimal) contexto.getParam("ALTURA");
-                BigDecimal largura = (BigDecimal) contexto.getParam("LARGURA");
-                BigDecimal profundidade = (BigDecimal) contexto.getParam("ESPESSURA");
-                Integer quantidadeMinima = (Integer) contexto.getParam("QTDMINIMA");
-                Integer multiplo = (Integer) contexto.getParam("MULTIPLO");
-                String imagem = "";
+    public String montarJsonProduto(ContextoAcao contexto) throws Exception {
+        List<String> camposVazios = new ArrayList<>();
+
+        try {
+/*
+            Object codProdParam = contexto.getParam("CODPROD");
+            if (codProdParam == null) camposVazios.add("CODPROD");
+            int codProd = codProdParam != null ?
+                    (codProdParam instanceof Integer ? (Integer) codProdParam :
+                            codProdParam instanceof BigDecimal ? ((BigDecimal) codProdParam).intValue() :
+                                    Integer.parseInt(codProdParam.toString())) : 0;
+
+ */
+            Integer codProd = (Integer) contexto.getParam("CODPROD");
+            if (codProd == null) camposVazios.add("CODPROD");
+
+            String descProd = (String) contexto.getParam("DESCRPROD");
+            if (descProd == null || descProd.trim().isEmpty()) camposVazios.add("DESCRPROD");
+
+
+            String marca = (String) contexto.getParam("MARCA");
+            if (marca == null || marca.trim().isEmpty()) camposVazios.add("MARCA");
+
+            String ncm = (String) contexto.getParam("NCM");
+            if (ncm == null || ncm.trim().isEmpty()) camposVazios.add("NCM");
+
+            String cest = (String) contexto.getParam("CEST");
+            // CEST pode ser opcional, então não adicionamos na lista de erros
+
+            BigDecimal pesoBruto = (BigDecimal) contexto.getParam("PESOBRUTO");
+            if (pesoBruto == null) camposVazios.add("PESOBRUTO");
+
+            BigDecimal pesoLiq = (BigDecimal) contexto.getParam("PESOLIQ");
+            if (pesoLiq == null) camposVazios.add("PESOLIQ");
+
+            String codVol = (String) contexto.getParam("CODVOL");
+            if (codVol == null || codVol.trim().isEmpty()) camposVazios.add("CODVOL");
+
+            BigDecimal altura = (BigDecimal) contexto.getParam("ALTURA");
+            if (altura == null) camposVazios.add("ALTURA");
+
+            BigDecimal largura = (BigDecimal) contexto.getParam("LARGURA");
+            if (largura == null) camposVazios.add("LARGURA");
+
+            BigDecimal profundidade = (BigDecimal) contexto.getParam("ESPESSURA");
+            if (profundidade == null) camposVazios.add("ESPESSURA");
+
+            Integer quantidadeMinima = (Integer) contexto.getParam("QTDMINIMA");
+            if (quantidadeMinima == null) camposVazios.add("QTDMINIMA");
+
+            Integer multiplo = (Integer) contexto.getParam("MULTIPLO");
+            if (multiplo == null) camposVazios.add("MULTIPLO");
+
+
+            if (!camposVazios.isEmpty()) {
+                String mensagemErro;
+                if (camposVazios.size() == 1) {
+                    mensagemErro = "Campo obrigatório não preenchido: " + camposVazios.get(0);
+                } else {
+                    mensagemErro = "Campos obrigatórios não preenchidos: " + String.join(", ", camposVazios);
+                }
+                contexto.setMensagemRetorno(mensagemErro);
+                throw new Exception(mensagemErro);
+            }
+
+
+            String cad = "A63862";
+            String unidadeMedidaPesoBruto = "KGM";
+            String unidadeMedidaConteudo = "MLT";
+            String gpc = "10003291";
+            String imagem = "";
 
 
 
@@ -55,6 +105,8 @@ public class ProdutoGS1 {
                         imagem = "https://raw.githubusercontent.com/dpti-akrus/imagensGS1/main/Safrasul.jpg";;
                         break;
                 }
+
+                System.out.println(marca);
 
 
                 // Monta o JSON na estrutura GS1
