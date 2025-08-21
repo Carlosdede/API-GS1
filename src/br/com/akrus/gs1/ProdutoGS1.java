@@ -1,11 +1,9 @@
 package br.com.akrus.gs1;
 
 import br.com.sankhya.extensions.actionbutton.ContextoAcao;
-import com.google.gson.Gson;
+import br.com.sankhya.extensions.actionbutton.Registro;
 import java.math.BigDecimal;
 import java.util.*;
-import java.math.BigDecimal;
-
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -18,73 +16,65 @@ public class ProdutoGS1 {
         List<String> camposVazios = new ArrayList<>();
 
         try {
-/*
-            Object codProdParam = contexto.getParam("CODPROD");
-            if (codProdParam == null) camposVazios.add("CODPROD");
-            int codProd = codProdParam != null ?
-                    (codProdParam instanceof Integer ? (Integer) codProdParam :
-                            codProdParam instanceof BigDecimal ? ((BigDecimal) codProdParam).intValue() :
-                                    Integer.parseInt(codProdParam.toString())) : 0;
+            Registro[] registros = contexto.getLinhas();
+            if (registros == null || registros.length == 0) {
+                throw new Exception("Nenhum produto selecionado");
+            }
 
- */
-            Integer codProd = (Integer) contexto.getParam("CODPROD");
+            // PEGA APENAS O PRIMEIRO REGISTRO
+            Registro registro = registros[0];
+
+            // AGORA CAPTURE OS CAMPOS
+            BigDecimal codProd = (BigDecimal) registro.getCampo("CODPROD");
             if (codProd == null) camposVazios.add("CODPROD");
 
-            String descProd = (String) contexto.getParam("DESCRPROD");
+            String descProd = (String) registro.getCampo("DESCRPROD");
             if (descProd == null || descProd.trim().isEmpty()) camposVazios.add("DESCRPROD");
 
-
-            String marca = (String) contexto.getParam("MARCA");
+            String marca = (String) registro.getCampo("MARCA");
             if (marca == null || marca.trim().isEmpty()) camposVazios.add("MARCA");
 
-            String ncm = (String) contexto.getParam("NCM");
+            String ncm = (String) registro.getCampo("NCM");
             if (ncm == null || ncm.trim().isEmpty()) camposVazios.add("NCM");
 
-            String cest = (String) contexto.getParam("CEST");
-            // CEST pode ser opcional, então não adicionamos na lista de erros
-
-            BigDecimal pesoBruto = (BigDecimal) contexto.getParam("PESOBRUTO");
+            BigDecimal pesoBruto = (BigDecimal) registro.getCampo("PESOBRUTO");
             if (pesoBruto == null) camposVazios.add("PESOBRUTO");
 
-            BigDecimal pesoLiq = (BigDecimal) contexto.getParam("PESOLIQ");
+            BigDecimal pesoLiq = (BigDecimal) registro.getCampo("PESOLIQ");
             if (pesoLiq == null) camposVazios.add("PESOLIQ");
 
-            String codVol = (String) contexto.getParam("CODVOL");
+            String codVol = (String) registro.getCampo("CODVOL");
             if (codVol == null || codVol.trim().isEmpty()) camposVazios.add("CODVOL");
 
-            BigDecimal altura = (BigDecimal) contexto.getParam("ALTURA");
+            BigDecimal altura = (BigDecimal) registro.getCampo("ALTURA");
             if (altura == null) camposVazios.add("ALTURA");
 
-            BigDecimal largura = (BigDecimal) contexto.getParam("LARGURA");
+            BigDecimal largura = (BigDecimal) registro.getCampo("LARGURA");
             if (largura == null) camposVazios.add("LARGURA");
 
-            BigDecimal profundidade = (BigDecimal) contexto.getParam("ESPESSURA");
+            BigDecimal profundidade = (BigDecimal) registro.getCampo("ESPESSURA");
             if (profundidade == null) camposVazios.add("ESPESSURA");
 
-            Integer quantidadeMinima = (Integer) contexto.getParam("QTDMINIMA");
-            if (quantidadeMinima == null) camposVazios.add("QTDMINIMA");
+            BigDecimal quantidadeMinima = (BigDecimal) registro.getCampo("AD_QTDMINIMA");
+            if (quantidadeMinima == null) camposVazios.add("AD_QTDMINIMA");
 
-            Integer multiplo = (Integer) contexto.getParam("MULTIPLO");
-            if (multiplo == null) camposVazios.add("MULTIPLO");
-
-
+            // VERIFICA CAMPOS VAZIOS
             if (!camposVazios.isEmpty()) {
-                String mensagemErro;
-                if (camposVazios.size() == 1) {
-                    mensagemErro = "Campo obrigatório não preenchido: " + camposVazios.get(0);
-                } else {
-                    mensagemErro = "Campos obrigatórios não preenchidos: " + String.join(", ", camposVazios);
-                }
+                String mensagemErro = camposVazios.size() == 1 ?
+                        "Campo obrigatório não preenchido: " + camposVazios.get(0) :
+                        "Campos obrigatórios não preenchidos: " + String.join(", ", camposVazios);
+
                 contexto.setMensagemRetorno(mensagemErro);
                 throw new Exception(mensagemErro);
             }
 
-
+            Integer multiplo = 1;
             String cad = "A63862";
             String unidadeMedidaPesoBruto = "KGM";
             String unidadeMedidaConteudo = "MLT";
             String gpc = "10003291";
             String imagem = "";
+            String cest = "";
 
 
 
@@ -131,7 +121,7 @@ public class ProdutoGS1 {
                 JSONArray additionalIds = new JSONArray();
                 additionalIds.put(new JSONObject()
                         .put("additionalTradeItemIdentificationTypeCode", "SKU")
-                        .put("additionalTradeItemIdentificationValue", codProd));
+                        .put("additionalTradeItemIdentificationValue", codProd.toString()));
                 produtoJson.put("additionalTradeItemIdentifications", additionalIds);
 
 // Identificação GS1

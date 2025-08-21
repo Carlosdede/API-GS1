@@ -2,24 +2,15 @@ package br.com.akrus.gs1;
 
 import br.com.sankhya.extensions.actionbutton.AcaoRotinaJava;
 import br.com.sankhya.extensions.actionbutton.ContextoAcao;
-import br.com.sankhya.jape.EntityFacade;
-import br.com.sankhya.jape.bmp.PersistentLocalEntity;
-import br.com.sankhya.jape.core.JapeSession;
-import br.com.sankhya.jape.dao.JdbcWrapper;
-import br.com.sankhya.jape.sql.NativeSql;
-import br.com.sankhya.jape.vo.DynamicVO;
-import br.com.sankhya.modelcore.util.DynamicEntityNames;
-import br.com.sankhya.modelcore.util.EntityFacadeFactory;
+import br.com.sankhya.extensions.actionbutton.Registro;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.math.BigDecimal;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.sql.Timestamp;
+
 
 public class EnviarGS1 implements AcaoRotinaJava {
 
@@ -28,6 +19,8 @@ public class EnviarGS1 implements AcaoRotinaJava {
     public void doAction(ContextoAcao contexto) throws Exception {
 
         try {
+
+
 
             //int codProd = (int) contexto.getParam("CODPROD");
 
@@ -88,11 +81,25 @@ public class EnviarGS1 implements AcaoRotinaJava {
 
             System.out.println("Resposta da GS1: " + response.toString());
 
-            // 4 - Extrair GTIN da resposta e atualizar o banco
+            // 4 - Extrair GTIN da resposta e atualizar
             if (status >= 200 && status < 300) {
                 String gtin = extrairGTIN(response.toString());
                 if (gtin != null && !gtin.isEmpty()) {
-                   // atualizarCodigoBarras(contexto, codProd, gtin);
+
+                    // AQUI - CÓDIGO PARA GRAVAR O GTIN
+                    Registro[] registros = contexto.getLinhas();
+                    if (registros == null || registros.length == 0) {
+                        throw new Exception("Nenhum produto selecionado");
+                    }
+
+                    // PEGA O REGISTRO SELECIONADO
+                    Registro registro = registros[0];
+
+                    // GRAVA O GTIN NO CAMPO
+                    registro.setCampo("AD_GTIN13", gtin);
+
+
+
                     contexto.setMensagemRetorno("GTIN " + gtin + " gerado com sucesso e salvo no produto!");
                 } else {
                     throw new Exception("GTIN não encontrado na resposta da API");
@@ -106,7 +113,6 @@ public class EnviarGS1 implements AcaoRotinaJava {
             throw e;
         }
     }
-
     private String extrairGTIN(String jsonResponse) throws Exception {
         try {
             JsonParser parser = new JsonParser();
@@ -129,25 +135,5 @@ public class EnviarGS1 implements AcaoRotinaJava {
         }
     }
 
-   /* private void atualizarCodigoBarras(ContextoAcao contexto, int codProd, String gtin) throws Exception {
-        JapeSession.SessionHandle hnd = null;
-        try {
-            hnd = JapeSession.open();
 
-            NativeSql sql = new NativeSql(hnd);
-            sql.appendSql("UPDATE TGFPRO SET AD_CODBARRA = :GTIN WHERE CODPROD = :CODPROD");
-            sql.setNamedParameter("GTIN", gtin);
-            sql.setNamedParameter("CODPROD", codProd);
-
-            sql.executeUpdate();
-
-            System.out.println("GTIN " + gtin + " gravado no produto " + codProd);
-
-        } catch (Exception e) {
-            throw new Exception("Erro ao gravar GTIN: " + e.getMessage());
-        } finally {
-            if (hnd != null) {
-                JapeSession.close(hnd);
-            }
-        } */
     }
