@@ -4,6 +4,8 @@ import br.com.sankhya.extensions.actionbutton.ContextoAcao;
 import br.com.sankhya.extensions.actionbutton.Registro;
 import java.math.BigDecimal;
 import java.util.*;
+
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -26,43 +28,43 @@ public class ProdutoGS1 {
 
             // AGORA CAPTURE OS CAMPOS
             BigDecimal codProd = (BigDecimal) registro.getCampo("CODPROD");
-            if (codProd == null) camposVazios.add("CODPROD");
+            if (codProd == null) camposVazios.add("Código");
 
             String descProd = (String) registro.getCampo("DESCRPROD");
-            if (descProd == null || descProd.trim().isEmpty()) camposVazios.add("DESCRPROD");
+            if (descProd == null || descProd.trim().isEmpty()) camposVazios.add("Descrição");
 
             String marca = (String) registro.getCampo("MARCA");
-            if (marca == null || marca.trim().isEmpty()) camposVazios.add("MARCA");
+            if (marca == null || marca.trim().isEmpty()) camposVazios.add("Marca");
 
             String ncm = (String) registro.getCampo("NCM");
             if (ncm == null || ncm.trim().isEmpty()) camposVazios.add("NCM");
 
             BigDecimal pesoBruto = (BigDecimal) registro.getCampo("PESOBRUTO");
-            if (pesoBruto == null) camposVazios.add("PESOBRUTO");
+            if (pesoBruto == null) camposVazios.add("Peso Bruto");
 
             BigDecimal pesoLiq = (BigDecimal) registro.getCampo("PESOLIQ");
-            if (pesoLiq == null) camposVazios.add("PESOLIQ");
+            if (pesoLiq == null) camposVazios.add("Peso líquido");
 
             String codVol = (String) registro.getCampo("CODVOL");
-            if (codVol == null || codVol.trim().isEmpty()) camposVazios.add("CODVOL");
+            if (codVol == null || codVol.trim().isEmpty()) camposVazios.add("Unidade padrão");
 
             BigDecimal altura = (BigDecimal) registro.getCampo("ALTURA");
-            if (altura == null) camposVazios.add("ALTURA");
+            if (altura == null) camposVazios.add("Altura");
 
             BigDecimal largura = (BigDecimal) registro.getCampo("LARGURA");
-            if (largura == null) camposVazios.add("LARGURA");
+            if (largura == null) camposVazios.add("Largura");
 
             BigDecimal profundidade = (BigDecimal) registro.getCampo("ESPESSURA");
-            if (profundidade == null) camposVazios.add("ESPESSURA");
+            if (profundidade == null) camposVazios.add("Espessura/Profundidade");
 
             BigDecimal quantidadeMinima = (BigDecimal) registro.getCampo("AD_QTDMINIMA");
-            if (quantidadeMinima == null) camposVazios.add("AD_QTDMINIMA");
+            if (quantidadeMinima == null) camposVazios.add("Quantidade Mínima");
 
             // VERIFICA CAMPOS VAZIOS
             if (!camposVazios.isEmpty()) {
                 String mensagemErro = camposVazios.size() == 1 ?
-                        "Campo obrigatório não preenchido: " + camposVazios.get(0) :
-                        "Campos obrigatórios não preenchidos: " + String.join(", ", camposVazios);
+                        "campo obrigatório não preenchido: " + camposVazios.get(0) :
+                        "campos obrigatórios não preenchidos: " + String.join(", ", camposVazios);
 
                 contexto.setMensagemRetorno(mensagemErro);
                 throw new Exception(mensagemErro);
@@ -97,6 +99,7 @@ public class ProdutoGS1 {
                 }
 
                 System.out.println(marca);
+
 
 
                 // Monta o JSON na estrutura GS1
@@ -209,7 +212,7 @@ public class ProdutoGS1 {
 
 
             } catch (Exception e) {
-                throw new Exception("Erro ao montar JSON do produto: " + e.getMessage(), e);
+                throw new Exception("Erro ao enviar o produto para GS1 " + e.getMessage(), e);
             }
         }
     }
