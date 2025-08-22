@@ -28,10 +28,10 @@ public class LoginGS1 implements AcaoRotinaJava {
 
         // Objeto que faz o login e obtém os tokens
         Login login = new Login(
-                "ae14b2eb-37ac-4e82-9d83-445176ff5027",
-                "640cf746-712b-4b21-99c7-883dd1f26998",
+                "client_id",
+                "client_secret",
                 "ti@safrasulsementes.com.br",
-                "Sup@2852"
+                "senha"
         );
 
         login.autenticar();
